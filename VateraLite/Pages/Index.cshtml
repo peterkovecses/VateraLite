@@ -1,0 +1,42 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Product page";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product page</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.10/signalr.min.js"></script>
+</head>
+<body>
+    <h1>Product</h1>
+    <form method="post">
+        <label for="amount">Quantity:</label>
+        <input type="number" id="quantity" name="quantity" min="1" max="2" required>
+        <br><br>
+        <button type="submit">Order</button>
+    </form>
+    <p id="message">@Model.Message</p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const connection = new signalR.HubConnectionBuilder()
+                .withUrl("/orderHub")
+                .configureLogging(signalR.LogLevel.Information)
+                .build();
+
+            connection.on("OrderStatus", function (message) {
+                const msgElement = document.getElementById("message");
+                msgElement.textContent = message;
+            });
+
+            connection.start().catch(function (err) {
+                return console.error(err.toString());
+            });
+        });
+    </script>
+</body>
+</html>
